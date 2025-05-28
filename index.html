@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>KKTIX 助手</title>
+  <script>
+    (function () {
+      document.querySelector('[ng-include*="event_info.html"]')?.remove();
+      setTimeout(() => {
+        const units = document.querySelectorAll('[ng-controller="TicketCtrl"]');
+        let soldOut = 0;
+        units.forEach(unit => {
+          const text = unit.querySelector('.ticket-quantity')?.textContent?.trim() || '';
+          if (/已售完|暫無票券/.test(text)) {
+            soldOut++;
+            unit.remove();
+          }
+        });
+        if (soldOut === units.length && units.length > 0) {
+          alert('⚠️ 所有票券已售完，請手動重新整理頁面');
+        }
+        document.querySelector('#person_agree_terms')?.click();
+      }, 500);
+    })();
+  </script>
+</head>
+<body>
+  <h2>KKTIX 助手啟動中...</h2>
+  <p>請先打開 KKTIX 活動頁，再打開本頁。</p>
+</body>
+</html>
