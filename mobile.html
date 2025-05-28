@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KKTIX 助手</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #f9f9f9;
+    }
+    button {
+      font-size: 1.2em;
+      padding: 1em 2em;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>KKTIX 助手</h1>
+  <p>點擊下方按鈕以執行助手腳本：</p>
+  <button onclick="runHelper()">▶ 執行 KKTIX 助手腳本</button>
+
+  <script>
+    function runHelper() {
+      const kktixWindow = window.open('', 'kktixTarget');
+      if (kktixWindow) {
+        kktixWindow.focus();
+        kktixWindow.eval(`(function() {
+          // 移除活動資訊區塊
+          const info = document.querySelector('.activity-info');
+          if (info) info.remove();
+
+          // 移除已售完或暫無票券的區塊
+          document.querySelectorAll('.ticket-type-row').forEach(row => {
+            const text = row.innerText;
+            if (text.includes('已售完') || text.includes('暫無票券')) {
+              row.remove();
+            }
+          });
+
+          // 自動勾選同意條款
+          const checkbox = document.querySelector('input[name="accept_agreement"]');
+          if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+          }
+
+          // 若全部票券售完，顯示提示
+          const remainingTickets = document.querySelectorAll('.ticket-type-row');
+          if (remainingTickets.length === 0) {
+            alert('目前所有票券均已售完。');
+          }
+
+          // 每 3 秒偵測票券釋出
+          setInterval(() => {
+            const rows = document.querySelectorAll('.ticket-type-row');
+            let available = false;
+            rows.forEach(row => {
+              const text = row.innerText;
+              if (!text.includes('已售完') && !text.includes('暫無票券')) {
+                available = true;
+              }
+            });
+            if (available) {
+              alert('🎉 發現可購票券！請馬上查看！');
+            }
+          }, 3000);
+        })();`);
+      } else {
+        alert('請先開啟 KKTIX 活動頁面，然後再執行此助手。');
+      }
+    }
+  </script>
+</body>
+</html>
